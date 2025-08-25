@@ -964,129 +964,78 @@ def show():
 # ======================
 # INITIALIZATION (Updated to include parent_password in sample student data)
 # ======================
+# ... (previous code) ...
+
 def initialize_all_data_files():
     """Initialize all data files with empty structures or sample data if they don't exist"""
     os.makedirs(DATA_DIR, exist_ok=True)
 
-    # Teacher data - crucial for login (empty on first run for admin registration)
-    if not os.path.exists(TEACHER_DATA_FILE):
-        save_data({}, TEACHER_DATA_FILE)
-    
-    # Student data (updated to include parent_password and consistent IDs)
-    if not os.path.exists(STUDENT_DATA_FILE):
-        students = {}
-        classes = get_full_class_list()
-        for class_name in classes:
-            students[class_name] = []
-            num_students = 5 if class_name in ["Nursery", "LKG", "UKG"] else 10
-            for i in range(1, num_students + 1):
-                student_uuid = str(uuid.uuid4()) # Use UUID for internal ID
-                admission_no = f"ADM{GRADE_LEVELS.index(class_name.split(' ')[0] if ' ' in class_name else class_name) + 1}{i:03d}"
-                
-                # Default parent password for sample data
-                default_parent_pwd = hash_password(f"parent{admission_no}") # Tie password to admission_no
-
-                students[class_name].append({
-                    "id": student_uuid, # UUID for internal ID
-                    "admission_no": admission_no, # String for admission number
-                    "name": f"Student {i} ({class_name})",
-                    "roll_no": f"{i}", # Add roll_no
-                    "class": class_name,
-                    "dob": "2010-01-01",
-                    "date_of_joining": "2023-09-01", # Add date_of_joining
-                    "date_of_tc": None, # Add date_of_tc
-                    "adhar_number": f"1234567890{i:02d}", # Add adhar_number
-                    "father_name": f"Father {i} {class_name}", # Add father_name
-                    "mother_name": f"Mother {i} {class_name}", # Add mother_name
-                    "parent_name": f"Parent {i} {class_name}",
-                    "parent_email": f"parent{i}_{class_name.replace(' ', '_')}@example.com",
-                    "parent_phone": f"555-01{i:02d}",
-                    "address": f"{i} Main Street, {class_name}",
-                    "emergency_contact": f"555-91{i:02d}",
-                    "contact_number": f"98765432{i:02d}", # Add contact_number
-                    "blood_group": "O+", # Add blood_group
-                    "financial_status": "Paid", # Add financial_status
-                    "passport_photo_path": None, # Add passport_photo_path
-                    "parent_password": default_parent_pwd # Add hashed parent password
-                })
-        save_data(students, STUDENT_DATA_FILE)
-
-    # Initialize other data files with empty structures if they don't exist
-    for data_file in [
-        ATTENDANCE_DATA_FILE,
-        ASSIGNMENTS_DATA_FILE,
-        TIMETABLE_DATA_FILE,
-        PERFORMANCE_DATA_FILE,
-        MESSAGES_DATA_FILE,
-        LEAVE_DATA_FILE,
-        CLASS_DATA_FILE,
-        FEE_DATA_FILE,
-        EVENT_NOTICE_DATA_FILE
-    ]:
-        if not os.path.exists(data_file):
-            save_data({}, data_file)
+    # ... (other file initializations) ...
 
     # Special initialization for RESOURCES_DATA_FILE with sample data
+    # Define sample_resources outside the if block to ensure it's always accessible
+    sample_resources = {
+        "1001": [ # Using teacher ID "1001" (John Doe)
+            {
+                "id": str(uuid.uuid4()),
+                "title": "Introduction to Algebra",
+                "description": "Lecture notes covering basic algebraic expressions and equations.",
+                "type": "Lecture Notes",
+                "class_name": "Grade 6A",
+                "tags": ["Math", "Algebra"],
+                "upload_date": "2023-01-10",
+                "upload_time": "09:30",
+                "file_name": "intro_algebra.pdf",
+                "file_type": "application/pdf",
+                "file_size": "500 KB",
+                "uploaded_by": "John Doe",
+                "download_count": 0,
+                "file_path": os.path.join(DATA_DIR, "attachments", "intro_algebra.pdf") # Placeholder path
+            },
+            {
+                "id": str(uuid.uuid4()),
+                "title": "Photosynthesis Process",
+                "description": "Presentation slides on how plants make food.",
+                "type": "Presentation",
+                "class_name": "Grade 5B",
+                "tags": ["Science", "Biology"],
+                "upload_date": "2023-02-15",
+                "upload_time": "11:00",
+                "file_name": "photosynthesis.pptx",
+                "file_type": "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+                "file_size": "1.2 MB",
+                "uploaded_by": "Jane Smith",
+                "download_count": 0,
+                "file_path": os.path.join(DATA_DIR, "attachments", "photosynthesis.pptx") # Placeholder path
+            },
+            {
+                "id": str(uuid.uuid4()),
+                "title": "World War II Overview",
+                "description": "Summary notes for key events and figures of WWII.",
+                "type": "Reference",
+                "class_name": "All Classes", # Example for 'All Classes'
+                "tags": ["History", "World Affairs"],
+                "upload_date": "2023-03-20",
+                "upload_time": "14:00",
+                "file_name": "wwii_overview.pdf",
+                "file_type": "application/pdf",
+                "file_size": "800 KB",
+                "uploaded_by": "John Doe",
+                "download_count": 0,
+                "file_path": os.path.join(DATA_DIR, "attachments", "wwii_overview.pdf") # Placeholder path
+            }
+        ]
+    }
+
     if not os.path.exists(RESOURCES_DATA_FILE):
-        sample_resources = {
-            "1001": [ # Using teacher ID "1001" (John Doe)
-                {
-                    "id": str(uuid.uuid4()),
-                    "title": "Introduction to Algebra",
-                    "description": "Lecture notes covering basic algebraic expressions and equations.",
-                    "type": "Lecture Notes",
-                    "class_name": "Grade 6A",
-                    "tags": ["Math", "Algebra"],
-                    "upload_date": "2023-01-10",
-                    "upload_time": "09:30",
-                    "file_name": "intro_algebra.pdf",
-                    "file_type": "application/pdf",
-                    "file_size": "500 KB",
-                    "uploaded_by": "John Doe",
-                    "download_count": 0,
-                    "file_path": os.path.join(DATA_DIR, "attachments", "intro_algebra.pdf") # Placeholder path
-                },
-                {
-                    "id": str(uuid.uuid4()),
-                    "title": "Photosynthesis Process",
-                    "description": "Presentation slides on how plants make food.",
-                    "type": "Presentation",
-                    "class_name": "Grade 5B",
-                    "tags": ["Science", "Biology"],
-                    "upload_date": "2023-02-15",
-                    "upload_time": "11:00",
-                    "file_name": "photosynthesis.pptx",
-                    "file_type": "application/vnd.openxmlformats-officedocument.presentationml.presentation",
-                    "file_size": "1.2 MB",
-                    "uploaded_by": "Jane Smith",
-                    "download_count": 0,
-                    "file_path": os.path.join(DATA_DIR, "attachments", "photosynthesis.pptx") # Placeholder path
-                },
-                {
-                    "id": str(uuid.uuid4()),
-                    "title": "World War II Overview",
-                    "description": "Summary notes for key events and figures of WWII.",
-                    "type": "Reference",
-                    "class_name": "All Classes", # Example for 'All Classes'
-                    "tags": ["History", "World Affairs"],
-                    "upload_date": "2023-03-20",
-                    "upload_time": "14:00",
-                    "file_name": "wwii_overview.pdf",
-                    "file_type": "application/pdf",
-                    "file_size": "800 KB",
-                    "uploaded_by": "John Doe",
-                    "download_count": 0,
-                    "file_path": os.path.join(DATA_DIR, "attachments", "wwii_overview.pdf") # Placeholder path
-                }
-            ]
-        }
         save_data(sample_resources, RESOURCES_DATA_FILE)
-    
+
     # Create attachments directories if they don't exist
     os.makedirs(os.path.join(DATA_DIR, "attachments"), exist_ok=True)
     os.makedirs(os.path.join(DATA_DIR, "leave_attachments"), exist_ok=True)
 
     # Create dummy files for sample resources to make them downloadable
+    # This loop is now safe because sample_resources is always defined
     for teacher_id, resources_list in sample_resources.items():
         for resource in resources_list:
             file_path = resource.get('file_path')
@@ -1157,3 +1106,4 @@ if __name__ == "__main__":
     """, unsafe_allow_html=True)
 
     show()
+
